@@ -2,6 +2,8 @@
 
 A comprehensive points-based reward system for managing user transactions, events, promotions, and more. StellarPoints provides role-based access control with interfaces for regular users, cashiers, managers, event organizers, and superusers.
 
+![Homepage](./Homepage.png)
+
 ## 🌐 Live Deployment
 
 **URL:** [https://stellarfrontend-production.up.railway.app/](https://stellarfrontend-production.up.railway.app/)
