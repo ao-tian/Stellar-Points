@@ -2,6 +2,18 @@
 
 A comprehensive points-based reward system for managing user transactions, events, promotions, and more. StellarPoints provides role-based access control with interfaces for regular users, cashiers, managers, event organizers, and superusers.
 
+## Screenshots
+
+<div align="center">
+  <img src="demo/demo1.png" alt="Dashboard Overview" width="45%" style="margin: 5px;">
+  <img src="demo/demo2.png" alt="Event Management" width="45%" style="margin: 5px;">
+  <br>
+  <img src="demo/demo3.png" alt="Transaction Interface" width="45%" style="margin: 5px;">
+  <img src="demo/demo4.png" alt="User Management" width="45%" style="margin: 5px;">
+  <br>
+  <img src="demo/demo5.png" alt="Promotion System" width="45%" style="margin: 5px;">
+</div>
+
 ## Features
 
 ### For Regular Users
@@ -279,6 +291,110 @@ The application was deployed on Railway with automatic database initialization. 
 - Netlify, Vercel, Cloudflare Pages, AWS S3 + CloudFront
 - Set `VITE_API_BASE_URL` in build environment variables
 - Deploy the `dist/` folder as a static site
+
+## Technology Stack & Architecture
+
+### Frontend Technologies
+
+- **React 18** - Modern UI library for building interactive user interfaces
+- **Vite** - Fast build tool and development server
+- **React Router** - Client-side routing and navigation
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **DaisyUI** - Component library built on Tailwind CSS
+- **Zustand** - Lightweight state management for authentication and global state
+- **React Query (TanStack Query)** - Powerful data fetching, caching, and synchronization
+- **Google Maps JavaScript API** - Interactive map visualization for event locations
+
+### Backend Technologies
+
+- **Node.js 22+** - JavaScript runtime environment
+- **Express.js** - Web application framework for RESTful APIs
+- **Prisma ORM** - Modern database toolkit and query builder
+- **SQLite** - Lightweight, file-based relational database
+- **JWT (JSON Web Tokens)** - Secure authentication and authorization
+- **bcrypt** - Password hashing for secure credential storage
+- **Google Geocoding API** - Address to coordinates conversion for event locations
+
+### Development Tools
+
+- **ESLint** - Code linting and quality assurance
+- **Cypress** - End-to-end testing framework
+- **Git** - Version control
+
+## Project Structure
+
+```
+Stellar_Points/
+├── backend/                    # Backend API server
+│   ├── prisma/
+│   │   ├── schema.prisma      # Database schema definition
+│   │   ├── seed.js            # Database seeding script
+│   │   └── dev.db             # SQLite database file
+│   ├── src/
+│   │   ├── server.js          # Express server entry point
+│   │   ├── app.js             # Express app configuration
+│   │   ├── db.js              # Prisma client initialization
+│   │   ├── initDb.js          # Database initialization script
+│   │   ├── middleware/
+│   │   │   └── auth.js        # JWT authentication middleware
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js  # Authentication endpoints
+│   │   │   ├── userRoutes.js  # User management endpoints
+│   │   │   ├── eventRoutes.js # Event management endpoints
+│   │   │   ├── promotionRoutes.js # Promotion endpoints
+│   │   │   └── transactionRoutes.js # Transaction endpoints
+│   │   └── helpers/
+│   │       ├── clearance.js   # Role-based access control
+│   │       ├── validation.js  # Input validation utilities
+│   │       ├── geocoding.js   # Google Maps geocoding
+│   │       ├── promoTx.js      # Promotion transaction logic
+│   │       ├── rateLimit.js   # Rate limiting middleware
+│   │       └── userQuery.js   # User query helpers
+│   └── package.json
+│
+├── frontend/                   # React frontend application
+│   ├── public/                # Static assets
+│   ├── src/
+│   │   ├── App.jsx            # Main application component
+│   │   ├── main.jsx           # Application entry point
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx     # Navigation bar component
+│   │   │   ├── auth/          # Authentication components
+│   │   │   ├── feedback/      # UI feedback components (toasts, spinners)
+│   │   │   ├── layout/        # Layout components (AppShell)
+│   │   │   ├── maps/          # Google Maps components
+│   │   │   └── ui/            # Reusable UI components (Card, Modal, DataTable)
+│   │   ├── pages/             # Page components
+│   │   │   ├── DashboardPage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── SignupPage.jsx
+│   │   │   ├── UserEventsPage.jsx
+│   │   │   ├── ManagerUsersPage.jsx
+│   │   │   └── ... (20+ page components)
+│   │   ├── lib/
+│   │   │   ├── apiClient.js   # API client with JWT handling
+│   │   │   ├── date.js        # Date formatting utilities
+│   │   │   └── cn.js          # Class name utility
+│   │   └── store/
+│   │       └── authStore.js   # Zustand authentication store
+│   ├── cypress/               # End-to-end tests
+│   └── package.json
+│
+├── demo/                       # Demo screenshots
+│   └── demo1-5.png           # Application screenshots
+│
+├── readme.md                   # This file
+└── INSTALL                     # Detailed installation guide
+```
+
+### Key Architectural Patterns
+
+- **RESTful API Design**: Backend exposes RESTful endpoints following standard HTTP methods
+- **Role-Based Access Control (RBAC)**: Multi-level permission system (regular, cashier, organizer, manager, superuser)
+- **Component-Based Architecture**: Frontend built with reusable React components
+- **State Management**: Zustand for global auth state, React Query for server state
+- **Database ORM**: Prisma provides type-safe database access and migrations
+- **JWT Authentication**: Stateless authentication with secure token-based sessions
 
 ## Additional Information
 
