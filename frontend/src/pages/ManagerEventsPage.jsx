@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "../components/layout";
-import { Card, FilterBar, DataTable } from "../components/ui";
+import { Card, FilterBar, DataTable, Modal } from "../components/ui";
 import { QueryBoundary } from "../components/feedback";
 import { apiFetch } from "../lib/apiClient";
 import { formatDateTime } from "../lib/date";
@@ -263,12 +263,12 @@ export default function ManagerEventsPage() {
             header: "Actions",
             render: (row) => (
                 <div className="flex flex-wrap gap-2">
-                    <button className="btn btn-ghost btn-xs" onClick={() => setSelectedEventId(row.id)}>
+                    <button className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3" onClick={() => setSelectedEventId(row.id)}>
                         Details
                     </button>
                     {!row.published && (
                         <button
-                            className="btn btn-ghost btn-xs"
+                            className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3"
                             onClick={() => handleUpdate("published", true)}
                         >
                             Publish
@@ -276,7 +276,7 @@ export default function ManagerEventsPage() {
                     )}
                     {!row.published && (
                         <button
-                            className="btn btn-ghost btn-xs text-error"
+                            className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3"
                             onClick={() => deleteEvent.mutate(row.id)}
                         >
                             Delete
@@ -358,7 +358,7 @@ export default function ManagerEventsPage() {
                     />
                     <button
                         type="submit"
-                        className="btn btn-primary md:col-span-2"
+                        className="btn md:col-span-2 font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                         disabled={createEvent.isLoading}
                     >
                         {createEvent.isLoading ? "Creating…" : "Create event"}
@@ -401,7 +401,7 @@ export default function ManagerEventsPage() {
                             <option value="endTime">End Time</option>
                         </select>
                     </div>
-                    <button className="btn btn-primary btn-sm" type="submit">
+                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                         Apply
                     </button>
                 </FilterBar>
@@ -411,7 +411,7 @@ export default function ManagerEventsPage() {
                 {data && data.count > 0 && (
                     <div className="mt-4 flex items-center justify-between">
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
                         >
@@ -421,7 +421,7 @@ export default function ManagerEventsPage() {
                             Page {page} of {Math.ceil(data.count / PAGE_SIZE) || 1}
                         </span>
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             onClick={() => setPage((p) => (p < Math.ceil(data.count / PAGE_SIZE) ? p + 1 : p))}
                             disabled={!data.count || page >= Math.ceil(data.count / PAGE_SIZE)}
                         >
@@ -431,11 +431,17 @@ export default function ManagerEventsPage() {
                 )}
             </Card>
 
-            {selectedEventId && (
-                <Card title="Event details">
-                    <QueryBoundary query={selectedEvent} loadingLabel="Loading event…">
-                        {selectedEvent.data ? (
-                            <div className="space-y-6">
+            <Modal
+                isOpen={!!selectedEventId}
+                onClose={() => {
+                    setSelectedEventId(null);
+                    setEditValues(null);
+                }}
+                title="Event Details"
+            >
+                <QueryBoundary query={selectedEvent} loadingLabel="Loading event…">
+                    {selectedEvent.data ? (
+                        <div className="space-y-6">
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
                                     <p className="text-xs text-neutral/60">Name</p>
@@ -470,6 +476,29 @@ export default function ManagerEventsPage() {
                                     </p>
                                 </div>
                             </div>
+                            {!editValues && (
+                                <div className="flex gap-3">
+                                    <button
+                                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
+                                        onClick={() => {
+                                            if (selectedEvent.data) {
+                                                setEditValues({
+                                                    name: selectedEvent.data.name,
+                                                    description: selectedEvent.data.description ?? "",
+                                                    location: selectedEvent.data.location ?? "",
+                                                    startTime: selectedEvent.data.startTime?.slice(0, 16) ?? "",
+                                                    endTime: selectedEvent.data.endTime?.slice(0, 16) ?? "",
+                                                    capacity: selectedEvent.data.capacity ?? "",
+                                                    latitude: selectedEvent.data.latitude ?? "",
+                                                    longitude: selectedEvent.data.longitude ?? "",
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            )}
                             {editValues && (
                                 <form className="grid gap-3 md:grid-cols-2" onSubmit={handleEditSubmit}>
                                     <input
@@ -526,15 +555,24 @@ export default function ManagerEventsPage() {
                                         value={editValues.longitude}
                                         onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
                                     />
-                                    <button type="submit" className="btn btn-primary md:col-span-2" disabled={updateEvent.isLoading}>
-                                        {updateEvent.isLoading ? "Saving…" : "Update event"}
-                                    </button>
+                                    <div className="md:col-span-2 flex gap-3">
+                                        <button type="submit" className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6" disabled={updateEvent.isLoading}>
+                                            {updateEvent.isLoading ? "Saving…" : "Update event"}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
+                                            onClick={() => setEditValues(null)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </form>
                             )}
                             <div className="flex gap-3">
                                 {!selectedEvent.data.published && (
                                     <button
-                                        className="btn btn-primary"
+                                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
                                         onClick={() => handleUpdate("published", true)}
                                     >
                                         Publish event
@@ -542,7 +580,7 @@ export default function ManagerEventsPage() {
                                 )}
                                 {!selectedEvent.data.published && (
                                     <button
-                                        className="btn btn-outline text-error"
+                                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
                                         onClick={() => deleteEvent.mutate(selectedEventId)}
                                     >
                                         Delete event
@@ -557,7 +595,7 @@ export default function ManagerEventsPage() {
                                                 {org.name ?? org.utorid} ({org.utorid})
                                             </span>
                                             <button
-                                                className="btn btn-ghost btn-xs text-error"
+                                                className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3"
                                                 onClick={() =>
                                                     removeOrganizer.mutate({
                                                         eventId: selectedEventId,
@@ -584,9 +622,9 @@ export default function ManagerEventsPage() {
                                         className={smallInputClass}
                                         value={organizerUtorid}
                                         onChange={(e) => setOrganizerUtorid(e.target.value)}
-                                        placeholder="UTORid"
+                                        placeholder="Username"
                                     />
-                                    <button className="btn btn-primary btn-sm" type="submit">
+                                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                                         Add organizer
                                     </button>
                                 </form>
@@ -604,9 +642,9 @@ export default function ManagerEventsPage() {
                                         className={smallInputClass}
                                         value={guestUtorid}
                                         onChange={(e) => setGuestUtorid(e.target.value)}
-                                        placeholder="UTORid"
+                                        placeholder="Username"
                                     />
-                                    <button className="btn btn-primary btn-sm" type="submit">
+                                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                                         Add guest
                                     </button>
                                 </form>
@@ -629,7 +667,7 @@ export default function ManagerEventsPage() {
                                 >
                                     <input
                                         className={baseInputClass}
-                                        placeholder="Guest UTORid (leave empty for all)"
+                                        placeholder="Guest username (leave empty for all)"
                                         value={awardUtorid}
                                         onChange={(e) => setAwardUtorid(e.target.value)}
                                     />
@@ -641,12 +679,12 @@ export default function ManagerEventsPage() {
                                         onChange={(e) => setAwardPoints(e.target.value)}
                                         required
                                     />
-                                    <button className="btn btn-primary md:col-span-2" type="submit">
+                                    <button className="btn md:col-span-2 font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6" type="submit">
                                         Award to single guest
                                     </button>
                                 </form>
                                 <button
-                                    className="btn btn-outline btn-sm mt-3"
+                                    className="btn btn-sm mt-3 font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                                     onClick={() =>
                                         awardAllMutation.mutate({
                                             eventId: selectedEventId,
@@ -663,8 +701,7 @@ export default function ManagerEventsPage() {
                             <p>No event selected.</p>
                         )}
                     </QueryBoundary>
-                </Card>
-            )}
+            </Modal>
         </AppShell>
     );
 }

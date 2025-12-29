@@ -122,7 +122,13 @@ router.get('/events', authenticateToken, requireRole('regular'), async (req, res
         const raw = await prisma.event.findMany({
             where,
             orderBy: orderByField,
-            include: {_count: {select: {guests: true}}},
+            include: {
+                _count: {select: {guests: true}},
+                guests: {
+                    where: {userId: req.user.id},
+                    select: {userId: true}
+                }
+            },
         });
         let filtered = raw;
         if (showFull !== undefined) {
@@ -137,9 +143,11 @@ router.get('/events', authenticateToken, requireRole('regular'), async (req, res
         const sliced = filtered.slice((p - 1) * l, p * l);
         const results = sliced.map(ev => {
             const numGuests = ev._count.guests;
-            return isManager(req.user) 
+            const isJoined = ev.guests.length > 0;
+            const base = isManager(req.user) 
                 ? listShapeForManager(ev, numGuests) 
                 : listShapeForRegular(ev, numGuests);
+            return {...base, isJoined};
         });
         return res.status(200).json({count: total, results});
     } catch (err) {
@@ -281,6 +289,7 @@ router.get('/events/:eventId', authenticateToken, requireRole('regular'), async 
         if (!ev.published && !canSeeFull) {
             return res.status(404).json({error: 'Event not found.'});
         }
+        const userIsGuest = ev.guests.some(g => g.user.id === req.user.id);
         const base = {
             id: ev.id,
             name: ev.name,
@@ -293,6 +302,7 @@ router.get('/events/:eventId', authenticateToken, requireRole('regular'), async 
                 id: o.user.id, utorid: o.user.utorid, name: o.user.name ?? null,
             })),
             numGuests: ev._count.guests,
+            isJoined: userIsGuest,
         };
         if (canSeeFull) {
             return res.json({

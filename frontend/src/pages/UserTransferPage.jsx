@@ -46,9 +46,9 @@ export default function UserTransferPage() {
         const trimmedUtorid = recipientUtorid.trim();
         const numericAmount = Number(amount);
 
-        // Validate UTORid format (7-8 alphanumeric characters)
-        if (!trimmedUtorid || !/^[A-Za-z0-9]{7,8}$/.test(trimmedUtorid)) {
-            setFormError("Recipient UTORid must be 7-8 alphanumeric characters.");
+        // Validate username format (3-30 alphanumeric characters, underscores, hyphens)
+        if (!trimmedUtorid || !/^[A-Za-z0-9_-]{3,30}$/.test(trimmedUtorid)) {
+            setFormError("Recipient username must be 3-30 characters (letters, numbers, underscores, hyphens).");
             return;
         }
         if (!Number.isInteger(numericAmount) || numericAmount <= 0) {
@@ -97,7 +97,7 @@ export default function UserTransferPage() {
                 <form className="grid gap-5" onSubmit={handleSubmit}>
                     <div className="space-y-2">
                         <label htmlFor="recipientUtorid" className="text-sm font-medium text-neutral/70 pl-1">
-                            Recipient UTORid
+                            Recipient Username
                         </label>
                         <input
                             id="recipientUtorid"
@@ -105,10 +105,10 @@ export default function UserTransferPage() {
                             className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
                             value={recipientUtorid}
                             onChange={(e) => setRecipientUtorid(e.target.value)}
-                            placeholder="e.g., neville1"
+                            placeholder="e.g., johndoe123"
                         />
                         <p className="text-xs text-base-content/60 pl-1">
-                            Enter the UTORid of the user you want to send points to.
+                            Enter the username of the user you want to send points to.
                         </p>
                     </div>
                     <div className="space-y-2">
@@ -140,7 +140,7 @@ export default function UserTransferPage() {
                     </div>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                         disabled={transferMutation.isLoading}
                     >
                         {transferMutation.isLoading ? "Sending…" : "Send points"}

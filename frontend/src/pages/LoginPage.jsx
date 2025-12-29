@@ -81,13 +81,13 @@ export default function LoginPage() {
                         </h1>
                         <h2 className="text-2xl font-semibold text-neutral">Welcome back</h2>
                         <p className="text-base text-neutral/70">
-                            Sign in with your UTORid credentials to access your account.
+                            Sign in with your username to access your account.
                         </p>
                     </div>
                     <form className="space-y-4" onSubmit={handleSubmit}>
                         <div className="form-control gap-2 mx-auto w-full max-w-xs">
                             <label htmlFor="utorid" className="block text-sm font-medium text-neutral/80">
-                                UTORid
+                                Username
                             </label>
                             <input
                                 id="utorid"
@@ -96,7 +96,7 @@ export default function LoginPage() {
                                 onChange={(e) => setUtorid(e.target.value)}
                                 required
                                 autoComplete="username"
-                                className="input input-bordered input-lg text-center"
+                                className="input input-bordered input-lg text-center border-2 border-brand-200 focus:border-brand-500"
                                 placeholder="e.g., super123"
                                 data-cy="login-utorid"
                             />
@@ -112,7 +112,7 @@ export default function LoginPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 autoComplete="current-password"
-                                className="input input-bordered input-lg text-center"
+                                className="input input-bordered input-lg text-center border-2 border-brand-200 focus:border-brand-500"
                                 placeholder="Your password"
                                 data-cy="login-password"
                             />
@@ -122,15 +122,36 @@ export default function LoginPage() {
                                 <span>{error}</span>
                             </div>
                         )}
-                        <div className="pt-2 flex justify-center">
+                        <div className="pt-2 flex flex-col items-center gap-3">
                             <button
                                 type="submit"
-                                className="btn btn-lg w-full max-w-xs border-0 bg-brand-500 text-white hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-200"
+                                className="btn btn-lg w-full max-w-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                                 disabled={loading}
                                 data-cy="login-submit"
                             >
                                 {loading ? "Logging in…" : "Login"}
                             </button>
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="text-sm text-neutral/70">
+                                    Don't have an account?{" "}
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate("/signup")}
+                                        className="link link-primary font-medium"
+                                    >
+                                        Sign up
+                                    </button>
+                                </div>
+                                <div className="text-sm text-neutral/70">
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate("/forgot-password")}
+                                        className="link link-primary font-medium"
+                                    >
+                                        Forgot password?
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

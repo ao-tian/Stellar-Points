@@ -78,7 +78,7 @@ export default function ManagerTransactionsPage() {
     const columns = useMemo(
         () => [
             "ID",
-            "User UTORid",
+            "User Username",
             "Type",
             "Spent",
             "Amount / Redeemed",
@@ -99,7 +99,7 @@ export default function ManagerTransactionsPage() {
                 <FilterBar onSubmit={handleApplyFilters} onReset={handleResetFilters}>
                     <div className="flex-1 min-w-[200px] space-y-2">
                         <label className="text-xs uppercase text-neutral/60 pl-1">
-                            User (name or UTORid)
+                            User (name or username)
                         </label>
                         <input
                             className={inputClass}
@@ -110,7 +110,7 @@ export default function ManagerTransactionsPage() {
                     </div>
                     <div className="flex-1 min-w-[200px] space-y-2">
                         <label className="text-xs uppercase text-neutral/60 pl-1">
-                            Created by (UTORid)
+                            Created by (username)
                         </label>
                         <input
                             className={inputClass}
@@ -166,10 +166,10 @@ export default function ManagerTransactionsPage() {
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button className="btn btn-primary btn-sm" type="submit">
+                        <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                             Apply
                         </button>
-                        <button className="btn btn-ghost btn-sm" type="reset">
+                        <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="reset">
                             Reset
                         </button>
                     </div>
@@ -256,7 +256,7 @@ export default function ManagerTransactionsPage() {
                 {total > 0 && (
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-neutral/70">
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             type="button"
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
@@ -267,7 +267,7 @@ export default function ManagerTransactionsPage() {
                             Page {page} of {totalPages}
                         </span>
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             type="button"
                             onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
                             disabled={page >= totalPages}

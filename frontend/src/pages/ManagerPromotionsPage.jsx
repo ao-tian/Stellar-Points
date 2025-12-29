@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "../components/layout";
-import { Card, DataTable, FilterBar } from "../components/ui";
+import { Card, DataTable, FilterBar, Modal } from "../components/ui";
 import { QueryBoundary } from "../components/feedback";
 import { apiFetch } from "../lib/apiClient";
 import { formatDateTime } from "../lib/date";
@@ -27,6 +27,7 @@ export default function ManagerPromotionsPage() {
     const [typeFilter, setTypeFilter] = useState("");
     const [orderBy, setOrderBy] = useState("name");
     const [formState, setFormState] = useState(initialForm);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const promotionsQuery = useQuery({
         queryKey: ["manager-promotions", { page, search, typeFilter, orderBy }],
@@ -50,6 +51,7 @@ export default function ManagerPromotionsPage() {
             }),
         onSuccess: () => {
             setFormState(initialForm);
+            setIsModalOpen(false);
             queryClient.invalidateQueries({ queryKey: ["manager-promotions"] });
         },
     });
@@ -62,6 +64,7 @@ export default function ManagerPromotionsPage() {
             }),
         onSuccess: () => {
             setFormState(initialForm);
+            setIsModalOpen(false);
             queryClient.invalidateQueries({ queryKey: ["manager-promotions"] });
         },
     });
@@ -100,6 +103,7 @@ export default function ManagerPromotionsPage() {
             rate: promo.rate ?? "",
             points: promo.points ?? "",
         });
+        setIsModalOpen(true);
     }
 
     function handleDelete(promo) {
@@ -139,14 +143,14 @@ export default function ManagerPromotionsPage() {
                     <div className="flex flex-wrap gap-2">
                         <button
                             type="button"
-                            className="btn btn-ghost btn-xs"
+                            className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3"
                             onClick={() => handleEdit(row)}
                         >
                             Edit
                         </button>
                         <button
                             type="button"
-                            className="btn btn-ghost btn-xs text-error"
+                            className="btn btn-xs font-medium transition-all bg-white text-red-600 border-2 border-red-600 hover:bg-red-600 hover:text-white hover:border-red-600 px-3"
                             onClick={() => handleDelete(row)}
                             disabled={deleteMutation.isLoading}
                         >
@@ -199,7 +203,7 @@ export default function ManagerPromotionsPage() {
                             <option value="endTime">End Time</option>
                         </select>
                     </div>
-                    <button className="btn btn-primary btn-sm" type="submit">
+                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                         Apply
                     </button>
                 </FilterBar>
@@ -212,7 +216,7 @@ export default function ManagerPromotionsPage() {
                 {data && (
                     <div className="mt-4 flex items-center justify-between">
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
                         >
@@ -222,7 +226,7 @@ export default function ManagerPromotionsPage() {
                             Page {page} of {Math.ceil(data.count / PAGE_SIZE) || 1}
                         </span>
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             onClick={() => setPage((p) => (p < Math.ceil(data.count / PAGE_SIZE) ? p + 1 : p))}
                             disabled={!data.count || page >= Math.ceil(data.count / PAGE_SIZE)}
                         >
@@ -233,6 +237,26 @@ export default function ManagerPromotionsPage() {
             </Card>
 
             <Card title="Promotion form">
+                <button
+                    type="button"
+                    className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
+                    onClick={() => {
+                        setFormState(initialForm);
+                        setIsModalOpen(true);
+                    }}
+                >
+                    Create New Promotion
+                </button>
+            </Card>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setFormState(initialForm);
+                }}
+                title={formState.id ? "Edit Promotion" : "Create Promotion"}
+            >
                 <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-neutral/70 pl-1">Name</label>
@@ -317,23 +341,24 @@ export default function ManagerPromotionsPage() {
                     <div className="md:col-span-2 flex gap-3">
                         <button
                             type="submit"
-                            className="btn btn-primary"
+                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                             disabled={createMutation.isLoading || updateMutation.isLoading}
                         >
                             {formState.id ? "Update promotion" : "Create promotion"}
                         </button>
-                        {formState.id && (
-                            <button
-                                type="button"
-                                className="btn btn-ghost"
-                                onClick={() => setFormState(initialForm)}
-                            >
-                                Cancel edit
-                            </button>
-                        )}
+                        <button
+                            type="button"
+                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
+                            onClick={() => {
+                                setIsModalOpen(false);
+                                setFormState(initialForm);
+                            }}
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </form>
-            </Card>
+            </Modal>
         </AppShell>
     );
 }

@@ -57,7 +57,7 @@ export default function UserPromotionsPage() {
                             <option value="onetime">One-time</option>
                         </select>
                     </div>
-                    <button className="btn btn-primary btn-sm" type="submit">
+                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                         Apply
                     </button>
                 </FilterBar>
@@ -116,7 +116,7 @@ export default function UserPromotionsPage() {
             {total > PAGE_SIZE && (
                 <div className="flex items-center justify-between">
                     <button
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
                     >
@@ -126,7 +126,7 @@ export default function UserPromotionsPage() {
                         Page {page} of {totalPages}
                     </span>
                     <button
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                         onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
                         disabled={page >= totalPages}
                     >

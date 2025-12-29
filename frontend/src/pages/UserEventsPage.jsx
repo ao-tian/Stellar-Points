@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { AppShell } from "../components/layout";
 import { Card, FilterBar } from "../components/ui";
 import { QueryBoundary } from "../components/feedback";
-import { apiFetch } from "../lib/apiClient";
+import { apiFetch, publishToast } from "../lib/apiClient";
 import { formatDateTime } from "../lib/date";
 
 const PAGE_SIZE = 6;
@@ -15,6 +15,7 @@ export default function UserEventsPage() {
     const [location, setLocation] = useState("");
     const [status, setStatus] = useState("upcoming");
     const [capacityFilter, setCapacityFilter] = useState("available");
+    const [showJoinedOnly, setShowJoinedOnly] = useState(false);
     const loadMoreRef = useRef(null);
 
     const filters = useMemo(
@@ -23,8 +24,9 @@ export default function UserEventsPage() {
             location,
             status,
             capacityFilter,
+            showJoinedOnly,
         }),
-        [search, location, status, capacityFilter],
+        [search, location, status, capacityFilter, showJoinedOnly],
     );
 
     const eventsQuery = useInfiniteQuery({
@@ -56,10 +58,13 @@ export default function UserEventsPage() {
     });
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = eventsQuery;
     const total = data?.pages?.[0]?.count ?? 0;
-    const events = useMemo(
-        () => data?.pages?.flatMap((page) => page.results) ?? [],
-        [data],
-    );
+    const events = useMemo(() => {
+        const allEvents = data?.pages?.flatMap((page) => page.results) ?? [];
+        if (showJoinedOnly) {
+            return allEvents.filter(event => event.isJoined);
+        }
+        return allEvents;
+    }, [data, showJoinedOnly]);
 
     const joinMutation = useMutation({
         mutationFn: (eventId) =>
@@ -67,8 +72,9 @@ export default function UserEventsPage() {
                 method: "POST",
                 body: {},
             }),
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["events"] });
+            publishToast('success', 'Successfully joined!', `You've joined "${data.name}".`);
         },
     });
 
@@ -79,6 +85,7 @@ export default function UserEventsPage() {
             }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] });
+            publishToast('success', 'RSVP canceled', 'You have canceled your RSVP for this event.');
         },
     });
 
@@ -191,7 +198,20 @@ export default function UserEventsPage() {
                             <option value="all">Include full events</option>
                         </select>
                     </div>
-                    <button className="btn btn-primary btn-sm" type="submit">
+                    <div className="space-y-2">
+                        <label className="text-xs uppercase text-base-content/60 pl-1">
+                            My Events
+                        </label>
+                        <select
+                            className="select select-bordered select-sm rounded-2xl border border-brand-200 bg-white px-3 py-2 text-sm text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
+                            value={showJoinedOnly ? "joined" : "all"}
+                            onChange={(e) => setShowJoinedOnly(e.target.value === "joined")}
+                        >
+                            <option value="all">All events</option>
+                            <option value="joined">My joined events</option>
+                        </select>
+                    </div>
+                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                         Apply
                     </button>
                 </FilterBar>
@@ -231,24 +251,32 @@ export default function UserEventsPage() {
                                         {formatDateTime(event.startTime)} –{" "}
                                         {formatDateTime(event.endTime)}
                                     </p >
-                                    <div className="mt-auto flex flex-wrap gap-2">
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary btn-sm"
-                                            onClick={() => handleJoin(event.id)}
-                                            disabled={joinMutation.isLoading}
-                                        >
-                                            Join
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline btn-sm"
-                                            onClick={() => handleLeave(event.id)}
-                                            disabled={leaveMutation.isLoading}
-                                        >
-                                            Cancel
-                                        </button>
-                                        <Link to={`/events/${event.id}`} className="btn btn-ghost btn-sm">
+                                    <div className="mt-auto flex flex-wrap gap-2 items-center">
+                                        {event.isJoined ? (
+                                            <>
+                                                <span className="badge badge-success badge-sm px-3 py-2">
+                                                    ✓ Joined
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
+                                                    onClick={() => handleLeave(event.id)}
+                                                    disabled={leaveMutation.isLoading}
+                                                >
+                                                    {leaveMutation.isLoading ? "Canceling…" : "Cancel RSVP"}
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
+                                                onClick={() => handleJoin(event.id)}
+                                                disabled={joinMutation.isLoading}
+                                            >
+                                                {joinMutation.isLoading ? "Joining…" : "Join"}
+                                            </button>
+                                        )}
+                                        <Link to={`/events/${event.id}`} className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4">
                                             Details
                                         </Link>
                                     </div>

@@ -2,19 +2,7 @@
 
 A comprehensive points-based reward system for managing user transactions, events, promotions, and more. StellarPoints provides role-based access control with interfaces for regular users, cashiers, managers, event organizers, and superusers.
 
-## 🌐 Live Deployment
-
-**URL:** [https://stellarfrontend-production.up.railway.app/](https://stellarfrontend-production.up.railway.app/)
-
-### Demo Credentials
-
-**Superuser Account:**
-- **UTORid:** `superman`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
-
-> **Note:** The demo database includes 30 users, 30 events, 30 promotions, and 120+ transactions. All demo users share the same password as the superuser account above.
-
-## ✨ Features
+## Features
 
 ### For Regular Users
 **Example Regular Account:**
@@ -93,38 +81,115 @@ A comprehensive points-based reward system for managing user transactions, event
 ## Getting Started
 
 ### Prerequisites
-- Node.js 22+ (the team uses Node 22.11/22.12 via [`nvm`](https://github.com/nvm-sh/nvm))
+- Node.js 22+ (recommended: Node 22.11/22.12 via [`nvm`](https://github.com/nvm-sh/nvm))
 - npm 10+
 - SQLite3 CLI (for inspecting the local DB)
 
-### Install dependencies
+### Step 1: Install Dependencies
+
+First, navigate to the project root directory and install dependencies for both backend and frontend:
+
 ```bash
-# From the repo root
-cd backend && npm install
-cd ../frontend && npm install
+# Navigate to the backend directory
+cd backend
+
+# Install backend dependencies
+npm install
+
+# Navigate to the frontend directory
+cd ../frontend
+
+# Install frontend dependencies
+npm install
 ```
 
-### Environment setup
-1. Copy `.env.example` inside `backend/` to `.env` and adjust secrets (JWT key, database URL, etc.).
-2. Run Prisma migrations and seed data so the demo accounts exist:
+### Step 2: Environment Setup
+
+1. Create a `.env` file in the `backend/` directory:
    ```bash
+   # From the project root
    cd backend
-   npx prisma migrate deploy
-   npm run seed   # if a seed script is available
+   ```
+   
+   Create a `.env` file with the following content:
+   ```env
+   JWT_SECRET=your-secret-key-here-minimum-32-characters
+   PORT=3000
+   GOOGLE_MAPS_API_KEY=your-google-maps-api-key (optional, for geocoding)
+   GOOGLE_GEOCODING_API_KEY=your-google-geocoding-api-key (optional)
+   SEED_PASSWORD=DevStrongPass! (optional, defaults to DevStrongPass!)
+   ```
+   
+   Generate a secure JWT_SECRET: `openssl rand -base64 32`
+
+2. Initialize the database and seed demo data:
+   ```bash
+   # Make sure you're in the backend directory
+   cd backend
+   
+   # Generate Prisma Client
+   npx prisma generate
+   
+   # Push database schema (creates tables)
+   npx prisma db push
+   
+   # Seed database with demo data (creates 30 users, 30 events, 30 promotions, 120+ transactions)
+   npm run seed
    ```
 
-### Running locally
-In two terminals:
-```bash
-# Backend API (http://localhost:3000)
-cd backend
-npm run dev
+### Step 3: Running the Application Locally
 
-# Frontend (Vite dev server on http://localhost:5173)
-cd frontend
+You need to run both the backend and frontend servers. Open two separate terminal windows:
+
+**Terminal 1 - Backend Server:**
+```bash
+# Navigate to the backend directory
+cd backend
+
+# Start the backend server
 npm run dev
 ```
-The Vite dev server proxies API calls to `http://localhost:3000` via `VITE_API_BASE_URL`. Adjust this value in `frontend/.env` if your backend runs elsewhere.
+
+The backend API will be available at `http://localhost:3000`
+
+**Terminal 2 - Frontend Server:**
+```bash
+# Navigate to the frontend directory
+cd frontend
+
+# Start the frontend development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`
+
+Open your browser and navigate to `http://localhost:5173` to access the application.
+
+### Demo Credentials
+
+After seeding the database, you can log in with these demo accounts (all share the same password):
+
+**Superuser Account:**
+- **UTORid:** `superman`
+- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+
+**Example Regular User:**
+- **UTORid:** `neville1`
+- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+
+**Example Cashier:**
+- **UTORid:** `hermione`
+- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+
+**Example Manager:**
+- **UTORid:** `yoda1234`
+- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+
+**Example Event Organizer:**
+- **UTORid:** `harrypot`
+- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+
+> **Note:** The demo database includes 30 users, 30 events, 30 promotions, and 120+ transactions. All demo users share the same password as listed above.
 
 ### Building for production
 ```bash
@@ -140,6 +205,81 @@ npm run start    # serves the API; configure a static host (Netlify, Vercel, etc
 - Backend tests / linters: `cd backend && npm test`
 - End-to-end (Cypress): ensure both servers are running, then `cd frontend && npx cypress open`
 
+## Deployment
+
+**Note:** The application was previously deployed on Railway, but the free tier has expired. The deployment is no longer active. Below is documentation of how the application was deployed on Railway for reference.
+
+### Previous Deployment: Railway
+
+The application was deployed on Railway with automatic database initialization. The deployment consisted of two services: one for the backend API and one for the frontend.
+
+#### Backend Deployment (Railway)
+
+1. **Connect Repository:**
+   - Created a new Railway project
+   - Connected the GitHub repository
+   - Selected the `backend/` directory as the root
+
+2. **Configure Environment Variables:**
+   In Railway dashboard → Backend Service → Variables:
+   ```
+   JWT_SECRET=<your-secure-secret-key>
+   GOOGLE_MAPS_API_KEY=<your-google-maps-api-key> (optional)
+   GOOGLE_GEOCODING_API_KEY=<your-geocoding-api-key> (optional)
+   SEED_PASSWORD=<password-for-seeded-users> (optional)
+   PORT=8080 (Railway sets this automatically)
+   ```
+
+3. **Build Configuration:**
+   - Railway automatically detected Node.js projects
+   - Build command: `npm install` (runs automatically)
+   - Start command: `npm start` (runs `node src/server.js`)
+
+4. **Database Initialization:**
+   - The backend automatically initialized the database on startup
+   - `src/initDb.js` runs `prisma generate`, `prisma db push`, and `npm run seed`
+   - Database was recreated on each deployment (Railway's filesystem is ephemeral)
+
+5. **Backend URL:**
+   - Railway provided a public URL (e.g., `https://stellarbackend-production.up.railway.app`)
+   - This URL was used for frontend configuration
+
+#### Frontend Deployment (Railway)
+
+1. **Create New Service:**
+   - In the same Railway project, added a new service
+   - Selected the `frontend/` directory as the root
+
+2. **Configure Environment Variables:**
+   In Railway dashboard → Frontend Service → Variables:
+   ```
+   VITE_API_BASE_URL=https://your-backend-url.railway.app
+   VITE_GOOGLE_MAPS_API_KEY=<your-google-maps-api-key> (for map features)
+   ```
+   **Important:** These must be set BEFORE building, as Vite embeds env vars at build time.
+
+3. **Build Configuration:**
+   - Railway detected Vite projects automatically
+   - Build command: `npm run build` (creates `dist/` folder)
+   - Start command: `npx serve -s dist -l 8080` (serves static files)
+
+4. **Redeploy After Env Changes:**
+   - If `VITE_*` variables were changed, a redeploy was required
+   - Vite embeds environment variables at build time, not runtime
+
+### Alternative Deployment Options
+
+**Backend:**
+- Render, Fly.io, Heroku, DigitalOcean App Platform
+- Ensure Node.js 22+ is supported
+- Configure CORS to allow your frontend domain
+- Set up persistent storage for SQLite (or migrate to PostgreSQL)
+
+**Frontend:**
+- Netlify, Vercel, Cloudflare Pages, AWS S3 + CloudFront
+- Set `VITE_API_BASE_URL` in build environment variables
+- Deploy the `dist/` folder as a static site
+
 ## Additional Information
 
-For detailed setup instructions, see the `INSTALL` file. The application is deployed on Railway with automatic database initialization and seeding on each deployment.
+For detailed setup instructions, deployment guides, and additional configuration options, see the `INSTALL` file.

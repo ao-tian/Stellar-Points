@@ -20,7 +20,16 @@ export default function ProfilePage() {
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
+    // Password change (requires old password)
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordMessage, setPasswordMessage] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
+    // Password reset (for forgot password - uses token)
     const [resetToken, setResetToken] = useState("");
+    const [resetOldPassword, setResetOldPassword] = useState("");
     const [resetPassword, setResetPassword] = useState("");
     const [resetConfirmPassword, setResetConfirmPassword] = useState("");
     const [resetMessage, setResetMessage] = useState("");
@@ -57,6 +66,25 @@ export default function ProfilePage() {
         },
     });
 
+    const changePasswordMutation = useMutation({
+        mutationFn: (payload) =>
+            apiFetch("/users/me/password", {
+                method: "PATCH",
+                body: payload,
+            }),
+        onSuccess: () => {
+            setPasswordMessage("Password changed successfully.");
+            setPasswordError("");
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+        },
+        onError: (err) => {
+            setPasswordMessage("");
+            setPasswordError(err.message || "Failed to change password.");
+        },
+    });
+
     const requestResetMutation = useMutation({
         mutationFn: (payload) =>
             apiFetch("/auth/resets", {
@@ -82,12 +110,16 @@ export default function ProfilePage() {
                 body: payload,
             }),
         onSuccess: () => {
-            setResetMessage("Password reset successfully. Please log in with your new password.");
+            setResetMessage("Password reset successfully. Redirecting to login...");
             setResetError("");
             setResetToken("");
             setResetPassword("");
             setResetConfirmPassword("");
             setResetStep("request");
+            // Redirect to login after 1.5 seconds
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1500);
         },
         onError: (err) => {
             setResetMessage("");
@@ -107,16 +139,48 @@ export default function ProfilePage() {
         updateMutation.mutate(payload);
     }
 
+    function handleChangePassword(e) {
+        e.preventDefault();
+        setPasswordError("");
+        setPasswordMessage("");
+
+        if (!oldPassword) {
+            setPasswordError("Current password is required.");
+            return;
+        }
+        if (!newPassword) {
+            setPasswordError("New password is required.");
+            return;
+        }
+        if (!PASSWORD_POLICY.test(newPassword)) {
+            setPasswordError("Password must be 8-20 chars with uppercase, lowercase, number, and special character.");
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordError("Passwords do not match.");
+            return;
+        }
+
+        changePasswordMutation.mutate({
+            old: oldPassword,
+            new: newPassword,
+        });
+    }
+
     function handleRequestReset(e) {
         e.preventDefault();
         setResetError("");
         setResetMessage("");
         const me = data;
         if (!me?.utorid) {
-            setResetError("Unable to get your UTORid.");
+            setResetError("Unable to get your username.");
             return;
         }
-        requestResetMutation.mutate({ utorid: me.utorid });
+        if (!me?.email) {
+            setResetError("Unable to get your email address.");
+            return;
+        }
+        requestResetMutation.mutate({ utorid: me.utorid, email: me.email });
     }
 
     function handleCompleteReset(e) {
@@ -124,8 +188,12 @@ export default function ProfilePage() {
         setResetError("");
         setResetMessage("");
 
+        if (!resetOldPassword) {
+            setResetError("Current password is required.");
+            return;
+        }
         if (!resetPassword) {
-            setResetError("Password is required.");
+            setResetError("New password is required.");
             return;
         }
         if (!PASSWORD_POLICY.test(resetPassword)) {
@@ -139,12 +207,13 @@ export default function ProfilePage() {
 
         const me = data;
         if (!me?.utorid) {
-            setResetError("Unable to get your UTORid.");
+            setResetError("Unable to get your username.");
             return;
         }
 
         completeResetMutation.mutate({
             utorid: me.utorid,
+            oldPassword: resetOldPassword,
             password: resetPassword,
         });
     }
@@ -220,7 +289,74 @@ export default function ProfilePage() {
                 </div>
             </Card>
 
-            <Card title="Password reset">
+            <Card title="Change Password">
+                <p className="text-sm text-neutral/70 mb-4">
+                    Change your password. You must enter your current password to set a new one.
+                </p>
+                {passwordError && (
+                    <div className="alert alert-error mb-4 text-sm">
+                        <span>{passwordError}</span>
+                    </div>
+                )}
+                {passwordMessage && (
+                    <div className="alert alert-success mb-4 text-sm">
+                        <span>{passwordMessage}</span>
+                    </div>
+                )}
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-neutral/70 pl-1">
+                            Current Password
+                        </label>
+                        <input
+                            className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
+                            type="password"
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                            placeholder="Enter your current password"
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-neutral/70 pl-1">
+                            New Password
+                        </label>
+                        <input
+                            className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="8-20 chars with uppercase, lowercase, number, special char"
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-neutral/70 pl-1">
+                            Confirm New Password
+                        </label>
+                        <input
+                            className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm your new password"
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
+                        disabled={changePasswordMutation.isLoading}
+                    >
+                        {changePasswordMutation.isLoading ? "Changing…" : "Change Password"}
+                    </button>
+                </form>
+            </Card>
+
+            <Card title="Forgot Password (Reset Token)">
+                <p className="text-sm text-neutral/70 mb-4">
+                    If you forgot your password, you can request a reset token. This requires your username and email.
+                </p>
                 {resetError && (
                     <div className="alert alert-error mb-4 text-sm">
                         <span>{resetError}</span>
@@ -233,15 +369,12 @@ export default function ProfilePage() {
                 )}
                 {resetStep === "request" ? (
                     <form onSubmit={handleRequestReset} className="space-y-4">
-                        <p className="text-sm text-neutral/70">
-                            Request a password reset token. You'll receive a token that you can use to set a new password.
-                        </p>
                         <button
                             type="submit"
-                            className="btn btn-primary"
+                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                             disabled={requestResetMutation.isLoading}
                         >
-                            {requestResetMutation.isLoading ? "Requesting…" : "Request reset token"}
+                            {requestResetMutation.isLoading ? "Requesting…" : "Request Reset Token"}
                         </button>
                     </form>
                 ) : (
@@ -255,6 +388,19 @@ export default function ProfilePage() {
                                 value={resetToken}
                                 onChange={(e) => setResetToken(e.target.value)}
                                 placeholder="Enter reset token"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-neutral/70 pl-1">
+                                Current Password
+                            </label>
+                            <input
+                                className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
+                                type="password"
+                                value={resetOldPassword}
+                                onChange={(e) => setResetOldPassword(e.target.value)}
+                                placeholder="Enter your current password"
                                 required
                             />
                         </div>
@@ -287,17 +433,18 @@ export default function ProfilePage() {
                         <div className="flex gap-2">
                             <button
                                 type="submit"
-                                className="btn btn-primary"
+                                className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                                 disabled={completeResetMutation.isLoading}
                             >
                                 {completeResetMutation.isLoading ? "Resetting…" : "Reset password"}
                             </button>
                             <button
                                 type="button"
-                                className="btn btn-ghost"
+                                className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
                                 onClick={() => {
                                     setResetStep("request");
                                     setResetToken("");
+                                    setResetOldPassword("");
                                     setResetPassword("");
                                     setResetConfirmPassword("");
                                     setResetMessage("");

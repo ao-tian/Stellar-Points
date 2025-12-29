@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppShell } from "../components/layout";
 import { Card } from "../components/ui";
-import { apiFetch } from "../lib/apiClient";
+import { apiFetch, publishToast } from "../lib/apiClient";
 import { formatDateTime } from "../lib/date";
 
 export default function EventDetailPage() {
@@ -19,9 +19,10 @@ export default function EventDetailPage() {
 
     const joinMutation = useMutation({
         mutationFn: () => apiFetch(`/events/${numericId}/guests/me`, { method: "POST", body: {} }),
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["event", numericId] });
             queryClient.invalidateQueries({ queryKey: ["events"] });
+            publishToast('success', 'Successfully joined!', `You've joined "${data.name}".`);
         },
     });
 
@@ -30,6 +31,7 @@ export default function EventDetailPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["event", numericId] });
             queryClient.invalidateQueries({ queryKey: ["events"] });
+            publishToast('success', 'RSVP canceled', 'You have canceled your RSVP for this event.');
         },
     });
 
@@ -103,26 +105,34 @@ export default function EventDetailPage() {
                 )}
             </Card>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
+                {event.isJoined ? (
+                    <>
+                        <span className="badge badge-success badge-lg px-4 py-2">
+                            ✓ You've joined this event
+                        </span>
+                        <button
+                            type="button"
+                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
+                            onClick={() => leaveMutation.mutate()}
+                            disabled={leaveMutation.isLoading}
+                        >
+                            {leaveMutation.isLoading ? "Canceling…" : "Cancel RSVP"}
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        type="button"
+                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
+                        onClick={() => joinMutation.mutate()}
+                        disabled={joinMutation.isLoading}
+                    >
+                        {joinMutation.isLoading ? "Joining…" : "Join event"}
+                    </button>
+                )}
                 <button
                     type="button"
-                    className="btn btn-primary"
-                    onClick={() => joinMutation.mutate()}
-                    disabled={joinMutation.isLoading}
-                >
-                    {joinMutation.isLoading ? "Joining…" : "Join event"}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-outline"
-                    onClick={() => leaveMutation.mutate()}
-                    disabled={leaveMutation.isLoading}
-                >
-                    {leaveMutation.isLoading ? "Leaving…" : "Cancel RSVP"}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-ghost"
+                    className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
                     onClick={() => navigate(-1)}
                 >
                     Back

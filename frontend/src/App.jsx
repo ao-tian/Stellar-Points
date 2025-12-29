@@ -4,11 +4,15 @@ import { ApiActivityIndicator, ApiToaster } from "./components/feedback";
 import { AuthGate } from "./components/auth";
 
 import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import MyPointsPage from "./pages/MyPointsPage.jsx";
 import MyTransactionsPage from "./pages/MyTransactionsPage.jsx";
 import CashierDashboardPage from "./pages/CashierDashboardPage.jsx";
 import ManagerUsersPage from "./pages/ManagerUsersPage.jsx";
+import SuperuserInfoPage from "./pages/SuperuserInfoPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import UserQrPage from "./pages/UserQrPage.jsx";
 import UserPromotionsPage from "./pages/UserPromotionsPage.jsx";
@@ -33,6 +37,9 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         {/* Regular user views */}
         <Route
             path="/me"
@@ -181,6 +188,64 @@ export default function App() {
             element={
               <AuthGate minRole="manager">
                 <ManagerEventsPage />
+              </AuthGate>
+            }
+        />
+        <Route
+            path="/manager/superuser-info"
+            element={
+              <AuthGate minRole="superuser">
+                <SuperuserInfoPage />
+              </AuthGate>
+            }
+        />
+
+        {/* Superuser - same pages as manager but distinct routes */}
+        <Route
+            path="/superuser/users"
+            element={
+              <AuthGate minRole="superuser">
+                <ManagerUsersPage />
+              </AuthGate>
+            }
+        />
+        <Route
+            path="/superuser/transactions"
+            element={
+              <AuthGate minRole="superuser">
+                <ManagerTransactionsPage />
+              </AuthGate>
+            }
+        />
+        <Route
+            path="/superuser/promotions"
+            element={
+              <AuthGate minRole="superuser">
+                <ManagerPromotionsPage />
+              </AuthGate>
+            }
+        />
+        <Route
+            path="/superuser/transactions/:transactionId"
+            element={
+              <AuthGate minRole="superuser">
+                <ManagerTransactionDetailPage />
+              </AuthGate>
+            }
+        />
+        <Route
+            path="/superuser/events"
+            element={
+              <AuthGate minRole="superuser">
+                <ManagerEventsPage />
+              </AuthGate>
+            }
+        />
+        <Route
+            path="/superuser/superuser-info"
+            element={
+              <AuthGate minRole="superuser">
+                <SuperuserInfoPage />
               </AuthGate>
             }
         />

@@ -61,7 +61,7 @@ export default function OrganizerEventsPage() {
             header: "Actions",
             render: (row) => (
                 <Link
-                    className="btn btn-ghost btn-xs"
+                    className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3"
                     to={`/organizer/events/${row.id}`}
                 >
                     Manage
@@ -112,7 +112,7 @@ export default function OrganizerEventsPage() {
                             <option value="endTime">End Time</option>
                         </select>
                     </div>
-                    <button className="btn btn-primary btn-sm" type="submit">
+                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                         Apply
                     </button>
                 </FilterBar>
@@ -124,7 +124,7 @@ export default function OrganizerEventsPage() {
                 {data && data.count > 0 && (
                     <div className="mt-4 flex items-center justify-between">
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
                         >
@@ -134,7 +134,7 @@ export default function OrganizerEventsPage() {
                             Page {page} of {Math.ceil(data.count / PAGE_SIZE) || 1}
                         </span>
                         <button
-                            className="btn btn-outline btn-sm"
+                            className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             onClick={() => setPage((p) => (p < Math.ceil(data.count / PAGE_SIZE) ? p + 1 : p))}
                             disabled={!data.count || page >= Math.ceil(data.count / PAGE_SIZE)}
                         >

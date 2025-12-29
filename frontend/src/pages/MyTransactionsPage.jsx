@@ -106,8 +106,10 @@ export default function MyTransactionsPage() {
                     <div className="space-y-1 text-sm text-base-content/70">
                         {row.spent != null && <div>Spent ${row.spent.toFixed(2)}</div>}
                         {row.relatedId != null && <div>Related #{row.relatedId}</div>}
-                        {row.promotionIds?.length > 0 && (
-                            <div>Promos: {row.promotionIds.join(", ")}</div>
+                        {row.promotions?.length > 0 && (
+                            <div>
+                                Promos: {row.promotions.map(p => p.name).join(", ")}
+                            </div>
                         )}
                     </div>
                 ),
@@ -188,7 +190,7 @@ export default function MyTransactionsPage() {
                             <option value="asc">Oldest first</option>
                         </select>
                     </div>
-                    <button type="submit" className="btn btn-primary btn-sm">
+                    <button type="submit" className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4">
                         Apply
                     </button>
                 </FilterBar>
@@ -209,7 +211,7 @@ export default function MyTransactionsPage() {
                 <div className="flex items-center justify-between gap-3">
                     <button
                         type="button"
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         disabled={page === 1}
                     >
@@ -221,7 +223,7 @@ export default function MyTransactionsPage() {
                     </span>
                     <button
                         type="button"
-                        className="btn btn-outline btn-sm"
+                        className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                         onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
                         disabled={page >= totalPages}
                     >

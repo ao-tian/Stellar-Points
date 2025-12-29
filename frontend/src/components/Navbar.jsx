@@ -15,12 +15,16 @@ const REGULAR_LINKS = [
     { to: "/me/promotions", label: "Promotions" },
 ];
 
+// Primary links shown in header (keep Transactions and Transfer visible)
+const PRIMARY_REGULAR_LINKS = REGULAR_LINKS.slice(0, 7); // Home through Transfer
+const MORE_REGULAR_LINKS = REGULAR_LINKS.slice(7); // Redeem and Promotions
+
 const INTERFACE_ROUTES = {
     regular: "/me",
     cashier: "/cashier",
     manager: "/manager/users",
     organizer: "/organizer/events",
-    superuser: "/manager/users",
+    superuser: "/superuser/users",
 };
 
 const DRAWER_ID = "primary-nav-drawer";
@@ -42,12 +46,29 @@ export default function Navbar() {
     );
 
     const managerLinks = useMemo(
-        () => [
-            { to: "/manager/users", label: "Users" },
-            { to: "/manager/transactions", label: "Transactions" },
-            { to: "/manager/promotions", label: "Promotions" },
-            { to: "/manager/events", label: "Events" },
-        ],
+        () => {
+            const links = [
+                { to: "/manager/users", label: "Users" },
+                { to: "/manager/transactions", label: "Transactions" },
+                { to: "/manager/promotions", label: "Promotions" },
+                { to: "/manager/events", label: "Events" },
+            ];
+            return links;
+        },
+        [],
+    );
+
+    const superuserLinks = useMemo(
+        () => {
+            const links = [
+                { to: "/superuser/users", label: "Users" },
+                { to: "/superuser/transactions", label: "Transactions" },
+                { to: "/superuser/promotions", label: "Promotions" },
+                { to: "/superuser/events", label: "Events" },
+                { to: "/superuser/superuser-info", label: "Superuser Info" },
+            ];
+            return links;
+        },
         [],
     );
 
@@ -60,6 +81,25 @@ export default function Navbar() {
 
     const interfaceOptions = useMemo(() => {
         if (!user) return [];
+        const role = String(user.role || "regular").toLowerCase();
+        
+        // Superuser can access all interfaces
+        if (role === "superuser") {
+            return [
+                { key: "regular", label: "Regular", path: INTERFACE_ROUTES.regular },
+                { key: "cashier", label: "Cashier", path: INTERFACE_ROUTES.cashier },
+                { key: "manager", label: "Manager", path: INTERFACE_ROUTES.manager },
+                { key: "organizer", label: "Organizer", path: INTERFACE_ROUTES.organizer },
+                { key: "superuser", label: "Superuser", path: INTERFACE_ROUTES.superuser },
+            ];
+        }
+        
+        // Manager can only access manager interface (no dropdown)
+        if (role === "manager") {
+            return []; // Empty array means no dropdown shown
+        }
+        
+        // Regular users with additional roles
         const options = [
             { key: "regular", label: "Regular", path: INTERFACE_ROUTES.regular },
         ];
@@ -70,25 +110,11 @@ export default function Navbar() {
                 path: INTERFACE_ROUTES.cashier,
             });
         }
-        if (hasRole("manager")) {
-            options.push({
-                key: "manager",
-                label: "Manager",
-                path: INTERFACE_ROUTES.manager,
-            });
-        }
         if (hasRole("organizer")) {
             options.push({
                 key: "organizer",
                 label: "Organizer",
                 path: INTERFACE_ROUTES.organizer,
-            });
-        }
-        if (hasRole("superuser")) {
-            options.push({
-                key: "superuser",
-                label: "Superuser",
-                path: INTERFACE_ROUTES.superuser,
             });
         }
         return options;
@@ -105,15 +131,24 @@ export default function Navbar() {
         if (hasRole("manager")) {
             groups.push({ key: "manager", title: "Manager admin", links: managerLinks });
         }
+        if (hasRole("superuser")) {
+            groups.push({ key: "superuser", title: "Superuser admin", links: superuserLinks });
+        }
         if (hasRole("organizer")) {
             groups.push({ key: "organizer", title: "Event organizer", links: organizerLinks });
         }
         return groups;
-    }, [user, hasRole, cashierLinks, managerLinks, organizerLinks]);
+    }, [user, hasRole, cashierLinks, managerLinks, superuserLinks, organizerLinks]);
 
     const currentInterface = useMemo(() => {
         if (!user) return "";
-        if (location.pathname.startsWith("/manager")) return "manager";
+        // Determine interface based on current pathname, not user role
+        if (location.pathname.startsWith("/superuser")) {
+            return "superuser";
+        }
+        if (location.pathname.startsWith("/manager")) {
+            return "manager";
+        }
         if (location.pathname.startsWith("/cashier")) return "cashier";
         if (location.pathname.startsWith("/organizer")) return "organizer";
         return "regular";
@@ -200,7 +235,7 @@ export default function Navbar() {
                         Switch interface
                     </label>
                     <select
-                        className="select select-bordered mt-1"
+                        className="select select-bordered mt-1 border-2 border-neutral-300 bg-white text-neutral hover:border-neutral-500 hover:bg-neutral-50 focus:border-black focus:bg-white focus:outline-none transition-colors duration-200 cursor-pointer px-4 py-2"
                         value={currentInterface}
                         onChange={(event) => {
                             closeDrawer();
@@ -241,12 +276,12 @@ export default function Navbar() {
     return (
         <>
             <header className="sticky top-0 z-40 border-b border-base-200/70 bg-white/90 backdrop-blur shadow-sm">
-                <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-6">
-                    <div className="flex items-center gap-3">
+                <div className="mx-auto flex w-full max-w-7xl items-center gap-6 px-4 py-3 lg:px-6">
+                    <div className="flex items-center gap-3 flex-shrink-0">
                         {user && (
                             <label
                                 htmlFor={DRAWER_ID}
-                                className="btn btn-ghost btn-square btn-sm border border-base-200 lg:hidden"
+                                className="btn btn-ghost btn-square btn-sm lg:hidden"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -268,10 +303,10 @@ export default function Navbar() {
                         )}
                         <NavLink 
                             to="/" 
-                            className="group relative flex items-center gap-2 px-2 py-1 transition-all duration-200 hover:scale-105"
+                            className="flex items-center transition-opacity hover:opacity-80 whitespace-nowrap"
                         >
                             <span 
-                                className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight"
+                                className="text-xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight"
                                 style={{
                                     backgroundImage: 'linear-gradient(135deg, #9333ea 0%, #3b82f6 50%, #4f46e5 100%)',
                                     WebkitBackgroundClip: 'text',
@@ -285,14 +320,57 @@ export default function Navbar() {
                     </div>
 
                     {user && (
-                        <div className="hidden flex-1 flex-wrap gap-6 lg:flex">
-                            {navGroups.map((group) => (
-                                <div key={group.key} className="min-w-[180px]">
-                                    <p className="text-[11px] uppercase tracking-wide text-neutral/50">
-                                        {group.title}
-                                    </p>
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                        {group.links.map((link) => (
+                        <nav className="hidden flex-1 items-center justify-start gap-1 ml-4 lg:flex">
+                            {(() => {
+                                // Show links based on current interface
+                                if (currentInterface === "cashier") {
+                                    return cashierLinks.map((link) => (
+                                        <NavLink
+                                            key={link.to}
+                                            to={link.to}
+                                            className={inlineLinkClass}
+                                        >
+                                            {link.label}
+                                        </NavLink>
+                                    ));
+                                }
+                                if (currentInterface === "manager") {
+                                    return managerLinks.map((link) => (
+                                        <NavLink
+                                            key={link.to}
+                                            to={link.to}
+                                            className={inlineLinkClass}
+                                        >
+                                            {link.label}
+                                        </NavLink>
+                                    ));
+                                }
+                                if (currentInterface === "superuser") {
+                                    return superuserLinks.map((link) => (
+                                        <NavLink
+                                            key={link.to}
+                                            to={link.to}
+                                            className={inlineLinkClass}
+                                        >
+                                            {link.label}
+                                        </NavLink>
+                                    ));
+                                }
+                                if (currentInterface === "organizer") {
+                                    return organizerLinks.map((link) => (
+                                        <NavLink
+                                            key={link.to}
+                                            to={link.to}
+                                            className={inlineLinkClass}
+                                        >
+                                            {link.label}
+                                        </NavLink>
+                                    ));
+                                }
+                                // Regular interface - show primary links + "More" dropdown
+                                return (
+                                    <>
+                                        {PRIMARY_REGULAR_LINKS.map((link) => (
                                             <NavLink
                                                 key={link.to}
                                                 to={link.to}
@@ -301,56 +379,94 @@ export default function Navbar() {
                                                 {link.label}
                                             </NavLink>
                                         ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                        {MORE_REGULAR_LINKS.length > 0 && (
+                                            <div className="dropdown dropdown-end">
+                                                <label tabIndex={0} className={cn(inlineLinkClass({ isActive: false }), "cursor-pointer flex items-center gap-1")}>
+                                                    More
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth="2"
+                                                        stroke="currentColor"
+                                                        className="h-3 w-3"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                                                        />
+                                                    </svg>
+                                                </label>
+                                                <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-50 w-52 border border-base-200 shadow-lg p-2 mt-2">
+                                                    {MORE_REGULAR_LINKS.map((link) => (
+                                                        <li key={link.to}>
+                                                            <NavLink
+                                                                to={link.to}
+                                                                className={({ isActive }) =>
+                                                                    cn(
+                                                                        "rounded-lg",
+                                                                        isActive ? "bg-brand-100 text-brand-700" : "hover:bg-base-200"
+                                                                    )
+                                                                }
+                                                            >
+                                                                {link.label}
+                                                            </NavLink>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </>
+                                );
+                            })()}
+                        </nav>
                     )}
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 flex-shrink-0">
                         {user && interfaceOptions.length > 1 && (
-                            <div className="hidden lg:flex lg:flex-col">
-                                <label className="text-xs uppercase text-neutral/50">
-                                    Switch interface
-                                </label>
-                                <select
-                                    className="select select-bordered select-sm mt-1"
-                                    value={currentInterface}
-                                    onChange={handleInterfaceChange}
-                                >
-                                    {interfaceOptions.map((option) => (
-                                        <option key={option.key} value={option.key}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            <select
+                                className="select select-bordered select-sm hidden lg:block min-w-[140px] border-2 border-neutral-300 bg-white text-neutral hover:border-neutral-500 hover:bg-neutral-50 focus:border-black focus:bg-white focus:outline-none transition-colors duration-200 cursor-pointer px-4 py-2"
+                                value={currentInterface}
+                                onChange={handleInterfaceChange}
+                            >
+                                {interfaceOptions.map((option) => (
+                                    <option key={option.key} value={option.key}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
                         )}
                         {user ? (
-                            <div className="flex items-center gap-3">
-                                <div className="text-right text-sm leading-tight text-neutral/80">
-                                    <div className="font-semibold text-neutral">
+                            <div className="flex items-center gap-2 lg:gap-3">
+                                <div className="hidden text-right text-sm lg:block whitespace-nowrap">
+                                    <div className="font-medium text-neutral">
                                         {user.utorid}
                                     </div>
-                                    <div className="text-xs capitalize text-neutral/60">
+                                    <div className="text-xs text-neutral/60 capitalize">
                                         {role}
                                     </div>
                                 </div>
                                 <button
                                     type="button"
-                                    className="btn btn-outline btn-sm hidden lg:inline-flex"
+                                    className="btn btn-ghost btn-sm whitespace-nowrap"
                                     onClick={handleLogout}
                                 >
                                     Logout
                                 </button>
                             </div>
                         ) : (
-                            <NavLink
-                                to="/login"
-                                className="btn btn-sm bg-white text-brand-600 border border-brand-500 hover:bg-brand-600 hover:text-white"
-                            >
-                                Login
-                            </NavLink>
+                            location.pathname !== "/login" && 
+                            location.pathname !== "/signup" && 
+                            location.pathname !== "/forgot-password" && 
+                            location.pathname !== "/reset-password" && (
+                                <NavLink
+                                    to="/login"
+                                    className="btn btn-primary btn-sm whitespace-nowrap"
+                                >
+                                    Login
+                                </NavLink>
+                            )
                         )}
                     </div>
                 </div>

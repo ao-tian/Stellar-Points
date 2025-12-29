@@ -114,7 +114,7 @@ export default function ManagerUsersPage() {
         setUserCreateMessage("");
 
         if (!newUserUtorid.trim()) {
-            setUserCreateError("UTORid is required.");
+            setUserCreateError("Username is required.");
             return;
         }
         if (!newUserName.trim()) {
@@ -144,7 +144,7 @@ export default function ManagerUsersPage() {
                             {u.name ?? u.utorid}
                         </p>
                         <p className="text-xs text-neutral/70">{u.email}</p>
-                        <p className="text-xs text-neutral/60">UTORid: {u.utorid}</p>
+                        <p className="text-xs text-neutral/60">Username: {u.utorid}</p>
                     </div>
                 ),
             },
@@ -205,9 +205,7 @@ export default function ManagerUsersPage() {
                 render: (u) => (
                     <button
                         type="button"
-                        className={`btn btn-sm w-full ${
-                            u.verified ? "btn-success" : "btn-outline"
-                        }`}
+                        className="btn btn-sm w-full font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                         disabled={updatingId === u.id}
                         onClick={() =>
                             updateUser(
@@ -251,7 +249,7 @@ export default function ManagerUsersPage() {
                     <div className="flex flex-col gap-2">
                         <button
                             type="button"
-                            className="btn btn-xs"
+                            className="btn btn-sm w-full font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                             disabled={updatingId === u.id}
                             onClick={() =>
                                 updateUser(
@@ -303,7 +301,7 @@ export default function ManagerUsersPage() {
                     <div className="grid gap-4 sm:grid-cols-3">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-neutral/70 pl-1">
-                                UTORid
+                                Username
                             </label>
                             <input
                                 className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
@@ -338,7 +336,7 @@ export default function ManagerUsersPage() {
                     </div>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                         disabled={createUserMutation.isLoading}
                     >
                         {createUserMutation.isLoading ? "Creating…" : "Create user"}
@@ -350,7 +348,7 @@ export default function ManagerUsersPage() {
                 <FilterBar onSubmit={handleFilters} onReset={handleResetFilters}>
                     <div className="flex-1 min-w-[180px] space-y-2">
                         <label className="text-xs uppercase text-neutral/60 pl-1">
-                            Search (name or UTORid)
+                            Search (name or username)
                         </label>
                         <input
                             className="input input-bordered input-sm rounded-2xl border border-brand-200 bg-white px-3 py-2 text-sm text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
@@ -403,10 +401,10 @@ export default function ManagerUsersPage() {
                         </select>
                     </div>
                     <div className="flex gap-2">
-                        <button className="btn btn-primary btn-sm" type="submit">
+                        <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="submit">
                             Apply
                         </button>
-                        <button className="btn btn-ghost btn-sm" type="reset">
+                        <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" type="reset">
                             Reset
                         </button>
                     </div>
@@ -431,7 +429,7 @@ export default function ManagerUsersPage() {
                         {total > 0 && (
                             <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                                 <button
-                                    className="btn btn-outline btn-sm"
+                                    className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                                     disabled={page === 1}
                                 >
@@ -441,7 +439,7 @@ export default function ManagerUsersPage() {
                                     Page {page} of {totalPages}
                                 </span>
                                 <button
-                                    className="btn btn-outline btn-sm"
+                                    className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-4"
                                     onClick={() =>
                                         setPage((p) => (p < totalPages ? p + 1 : p))
                                     }

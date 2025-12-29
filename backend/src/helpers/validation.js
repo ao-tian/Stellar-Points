@@ -3,9 +3,19 @@
 export function isValidUtorid(utorid) {
     return typeof utorid === 'string' && /^[A-Za-z0-9]{7,8}$/.test(utorid);
 }
+
+// General username validation - 3-30 alphanumeric characters, underscores, and hyphens
+export function isValidUsername(username) {
+    return typeof username === 'string' && /^[A-Za-z0-9_-]{3,30}$/.test(username);
+}
   
 export function isValidUofTEmail(email) {
     return typeof email === 'string' && /^[^\s@]+@(mail\.)?utoronto\.ca$/.test(email);
+}
+
+// General email validation - accepts any valid email format
+export function isValidEmail(email) {
+    return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
   
 export function isValidName(name) {

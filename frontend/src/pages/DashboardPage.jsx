@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { AppShell } from "../components/layout";
@@ -26,7 +27,11 @@ export default function DashboardPage() {
         queryFn: () => apiFetch("/promotions?page=1&limit=3"),
     });
 
-    const recentTransactions = txData?.results ?? [];
+    const recentTransactions = useMemo(() => {
+        const transactions = txData?.results ?? [];
+        // Sort by ID descending to show newest first (ID auto-increments)
+        return [...transactions].sort((a, b) => b.id - a.id);
+    }, [txData?.results]);
     const upcomingEvents = eventsData?.results ?? [];
     const promotions = promosData?.results ?? [];
 

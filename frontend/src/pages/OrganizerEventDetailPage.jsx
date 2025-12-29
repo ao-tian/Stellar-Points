@@ -182,7 +182,7 @@ export default function OrganizerEventDetailPage() {
                             placeholder="Event description"
                         />
                     </div>
-                    <button className="btn btn-primary" type="submit" disabled={updateMutation.isLoading}>
+                    <button className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6" type="submit" disabled={updateMutation.isLoading}>
                         {updateMutation.isLoading ? "Saving…" : "Save changes"}
                     </button>
                 </form>
@@ -194,7 +194,7 @@ export default function OrganizerEventDetailPage() {
                         <QRCode value={shareLink || String(numericId)} size={128} />
                     </div>
                     <p className="text-sm text-neutral/70">Event link: {shareLink}</p>
-                    <button className="btn btn-ghost btn-sm" onClick={copyShareLink}>
+                    <button className="btn btn-sm font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-4" onClick={copyShareLink}>
                         Copy link
                     </button>
                 </div>
@@ -209,7 +209,7 @@ export default function OrganizerEventDetailPage() {
                                     {guest.name ?? guest.utorid} ({guest.utorid})
                                 </span>
                                 <button
-                                    className="btn btn-ghost btn-xs text-error"
+                                    className="btn btn-xs font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-3"
                                     type="button"
                                     onClick={() => removeGuestMutation.mutate(guest.id)}
                                 >
@@ -229,13 +229,13 @@ export default function OrganizerEventDetailPage() {
                     }}
                 >
                     <input
-                        className="input input-bordered"
-                        placeholder="Add guest by UTORid"
+                        className={baseInputClass}
+                        placeholder="Add guest by username"
                         value={newGuestUtorid}
                         onChange={(e) => setNewGuestUtorid(e.target.value)}
                         required
                     />
-                    <button className="btn btn-primary" type="submit" disabled={addGuestMutation.isLoading}>
+                    <button className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6" type="submit" disabled={addGuestMutation.isLoading}>
                         {addGuestMutation.isLoading ? "Adding…" : "Add guest"}
                     </button>
                 </form>
@@ -245,7 +245,7 @@ export default function OrganizerEventDetailPage() {
                 <div className="mb-6 flex gap-2 rounded-2xl bg-base-200/60 p-1">
                     <button
                         type="button"
-                        className={`btn btn-sm flex-1 ${awardMode === "single" ? "btn-primary" : "btn-ghost"}`}
+                        className={`btn btn-sm flex-1 font-medium transition-all px-4 ${awardMode === "single" ? "bg-black text-white border-2 border-white" : "bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white"}`}
                         onClick={() => setAwardMode("single")}
                         data-cy="award-mode-single"
                     >
@@ -253,7 +253,7 @@ export default function OrganizerEventDetailPage() {
                     </button>
                     <button
                         type="button"
-                        className={`btn btn-sm flex-1 ${awardMode === "all" ? "btn-primary" : "btn-ghost"}`}
+                        className={`btn btn-sm flex-1 font-medium transition-all px-4 ${awardMode === "all" ? "bg-black text-white border-2 border-white" : "bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white"}`}
                         onClick={() => setAwardMode("all")}
                         data-cy="award-mode-all"
                     >
@@ -264,11 +264,11 @@ export default function OrganizerEventDetailPage() {
                     {awardMode === "single" ? (
                         <div className="md:col-span-2 space-y-2">
                             <label className="block text-sm font-medium text-neutral/70 pl-1">
-                                Recipient UTORid
+                                Recipient Username
                             </label>
                             <input
                                 className={baseInputClass}
-                                placeholder="Guest UTORid"
+                                placeholder="Guest username"
                                 value={awardGuestUtorid}
                                 onChange={(e) => setAwardGuestUtorid(e.target.value)}
                                 required={awardMode === "single"}
@@ -309,7 +309,7 @@ export default function OrganizerEventDetailPage() {
                         />
                     </div>
                     <button
-                        className="btn btn-primary md:col-span-2"
+                        className="btn md:col-span-2 font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white px-6"
                         type="submit"
                         disabled={
                             awardMutation.isLoading ||

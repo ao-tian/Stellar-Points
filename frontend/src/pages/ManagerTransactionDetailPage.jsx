@@ -210,7 +210,7 @@ export default function ManagerTransactionDetailPage() {
                         </div>
                         <div className="md:col-span-2 flex gap-3">
                             <button
-                                className={`btn ${tx.suspicious ? "btn-error" : "btn-outline"}`}
+                                className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                                 onClick={handleToggle}
                                 disabled={suspiciousMutation.isLoading}
                             >

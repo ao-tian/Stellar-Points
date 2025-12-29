@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../db.js';
 import { v4 as uuidv4 } from 'uuid';
-import { isValidUtorid, isValidPassword } from '../helpers/validation.js';
+import { isValidUtorid, isValidUsername, isValidEmail, isValidPassword } from '../helpers/validation.js';
 import { tooSoon, clientIp } from '../helpers/rateLimit.js';
 
 const router = express.Router();
@@ -55,14 +55,23 @@ router.post('/resets', async (req, res) => {
     if (tooSoon(ip)) {
         return res.status(429).json({error: 'Too Many Requests'});
     }
-    const {utorid} = req.body || {};
-    if (!isValidUtorid(utorid)) {
-        return res.status(400).json({error: 'utorid must be 7-8 alphanumeric characters'});
+    const {utorid, email} = req.body || {};
+    if (!isValidUsername(utorid)) {
+        return res.status(400).json({error: 'Username must be 3-30 characters (letters, numbers, underscores, hyphens)'});
+    }
+    if (!isValidEmail(email)) {
+        return res.status(400).json({error: 'Valid email address is required'});
     }
     try {
         const user = await prisma.user.findUnique({where: {utorid}});
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            // Don't reveal if user exists - return same message for security
+            return res.status(404).json({ error: 'Username and email combination not found' });
+        }
+        // Verify email matches the user's email (case-insensitive)
+        if (user.email.toLowerCase() !== email.toLowerCase()) {
+            // Don't reveal if user exists - return same message for security
+            return res.status(404).json({ error: 'Username and email combination not found' });
         }
         const token = uuidv4();
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
@@ -83,9 +92,12 @@ router.post('/resets', async (req, res) => {
 // POST for /auth/resets/:resetToken (Any)
 router.post('/resets/:resetToken', async (req, res) => {
     const {resetToken} = req.params;
-    const {utorid, password} = req.body || {};
+    const {utorid, oldPassword, password} = req.body || {};
     if (typeof utorid !== 'string' || typeof password !== 'string') {
         return res.status(400).json({ error: 'utorid and password are required' });
+    }
+    if (typeof oldPassword !== 'string') {
+        return res.status(400).json({ error: 'Old password is required' });
     }
     if (!isValidPassword(password)) {
         return res.status(400).json({
@@ -106,6 +118,14 @@ router.post('/resets/:resetToken', async (req, res) => {
                 data: {resetToken: null, expiresAt: null}
             });
             return res.status(410).json({error: 'Reset token expired'});
+        }
+        // Verify old password matches
+        if (!byToken.passwordHash || !byToken.passwordHash.startsWith('$2')) {
+            return res.status(403).json({ error: 'Current password is incorrect' });
+        }
+        const oldPasswordValid = await bcrypt.compare(oldPassword, byToken.passwordHash);
+        if (!oldPasswordValid) {
+            return res.status(403).json({ error: 'Current password is incorrect' });
         }
         const passwordHash = await bcrypt.hash(password, 10);
         await prisma.user.update({

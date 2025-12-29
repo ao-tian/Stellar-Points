@@ -33,6 +33,18 @@ function publish(event) {
     });
 }
 
+export function publishToast(status, title, message, duration = 4000) {
+    const requestId = ++requestCounter;
+    publish({
+        type: "toast",
+        id: requestId,
+        status,
+        title,
+        message,
+        duration,
+    });
+}
+
 // Helper to call the backend with JSON + optional Bearer token
 export async function apiFetch(path, options = {}) {
     const {

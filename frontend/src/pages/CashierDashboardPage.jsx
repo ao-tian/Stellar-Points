@@ -116,7 +116,7 @@ export default function CashierDashboardPage() {
         setTxMessage("");
 
         if (!customerUtorid.trim()) {
-            setTxError("Customer UTORid is required.");
+            setTxError("Customer username is required.");
             return;
         }
 
@@ -152,7 +152,7 @@ export default function CashierDashboardPage() {
         setUserCreateMessage("");
 
         if (!newUserUtorid.trim()) {
-            setUserCreateError("UTORid is required.");
+            setUserCreateError("Username is required.");
             return;
         }
         if (!newUserName.trim()) {
@@ -212,7 +212,7 @@ export default function CashierDashboardPage() {
                     <form className="space-y-5" onSubmit={handleCreate}>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-neutral/70 pl-1">
-                                Customer UTORid
+                                Customer Username
                             </label>
                             <input
                                 className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
@@ -259,7 +259,7 @@ export default function CashierDashboardPage() {
                         </div>
                         <button
                             type="submit"
-                            className="btn btn-primary"
+                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                             disabled={createMutation.isLoading}
                         >
                             {createMutation.isLoading ? "Submitting…" : "Create transaction"}
@@ -293,7 +293,7 @@ export default function CashierDashboardPage() {
                         </div>
                         <button
                             type="submit"
-                            className="btn btn-primary"
+                            className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                             disabled={processMutation.isLoading}
                         >
                             {processMutation.isLoading ? "Processing…" : "Process redemption"}
@@ -320,7 +320,7 @@ export default function CashierDashboardPage() {
                 <form className="space-y-5" onSubmit={handleCreateUser}>
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-neutral/70 pl-1">
-                            UTORid
+                            Username
                         </label>
                         <input
                             className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
@@ -354,7 +354,7 @@ export default function CashierDashboardPage() {
                     </div>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                         disabled={createUserMutation.isLoading}
                     >
                         {createUserMutation.isLoading ? "Creating…" : "Create user"}

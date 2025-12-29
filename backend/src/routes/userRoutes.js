@@ -9,6 +9,8 @@ import { authenticateToken, requireRole } from '../middleware/auth.js';
 import {
     isValidUtorid,
     isValidUofTEmail,
+    isValidUsername,
+    isValidEmail,
     isValidName,
     isValidPassword,
     parseBirthday,
@@ -43,6 +45,61 @@ async function getAvailableOneTimePromosForUser(userId) {
         points: p.points ?? 0,
     }));
 }
+
+// POST for /users/public (Public signup - no auth required)
+// IMPORTANT: This route must be defined before router.post('/') to avoid route conflicts
+router.post('/public', async(req, res) => {
+    console.log('POST /users/public called', req.body);
+    const {utorid, name, email, password} = req.body;
+    if (!isValidUsername(utorid)) {
+        return res.status(400).json({error: 'Username must be 3-30 characters (letters, numbers, underscores, hyphens).'});
+    }
+    if (!isValidName(name)) {
+        return res.status(400).json({error: 'name must be 1-50 characters.'});
+    }
+    if (!isValidEmail(email)) {
+        return res.status(400).json({error: 'email must be a valid email address.'});
+    }
+    if (!password || typeof password !== 'string') {
+        return res.status(400).json({error: 'Password is required.'});
+    }
+    if (!isValidPassword(password)) {
+        return res.status(400).json({
+            error: 'Password must be 8-20 chars with uppercase, lowercase, number, and special character'
+        });
+    }
+    try {
+        const existing = await prisma.user.findUnique({where: {utorid}});
+        if (existing) {
+            return res.status(409).json({error: 'User already exists.'});
+        }
+        // Hash the provided password
+        const passwordHash = await bcrypt.hash(password, 10);
+        const user = await prisma.user.create({
+            data: {
+                utorid,
+                email,
+                name,
+                verified: true, // Auto-verify when user sets their own password
+                passwordHash,
+            },
+            select: {id: true, utorid: true, name: true, email: true, verified: true},
+        });
+        return res.status(201).json({
+            id: user.id,
+            utorid: user.utorid,
+            name: user.name,
+            email: user.email,
+            verified: user.verified,
+        });
+    } catch (err) {
+        console.error('Error creating user:', err);
+        if (err.code === 'P2002') {
+            return res.status(409).json({error: 'Email or utorid already exists.'});
+        }
+        return res.status(500).json({error: 'Internal Server Error'});
+    }
+});
 
 // POST for /users (Cashier or higher)
 router.post('/', authenticateToken, requireRole('cashier'), async(req, res) => {

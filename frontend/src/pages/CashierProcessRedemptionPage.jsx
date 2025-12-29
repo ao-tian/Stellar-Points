@@ -83,20 +83,13 @@ export default function CashierProcessRedemptionPage() {
                         value={txId}
                         onChange={(e) => setTxId(e.target.value)}
                         placeholder="e.g., 123"
-                        style={{ width: "100%" }}
+                        className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
                     />
                 </div>
                 <button
                     type="submit"
                     disabled={loading}
-                    style={{
-                        padding: "0.5rem 1rem",
-                        borderRadius: 999,
-                        border: "1px solid #4f46e5",
-                        backgroundColor: "#4f46e5",
-                        color: "white",
-                        fontWeight: 500,
-                    }}
+                    className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                 >
                     {loading ? "Processing…" : "Process Redemption"}
                 </button>
@@ -104,14 +97,7 @@ export default function CashierProcessRedemptionPage() {
                     type="button"
                     onClick={handleReset}
                     disabled={loading}
-                    style={{
-                        padding: "0.45rem 0.9rem",
-                        borderRadius: 999,
-                        border: "1px solid #d1d5db",
-                        backgroundColor: "white",
-                        color: "#374151",
-                        fontWeight: 400,
-                    }}
+                    className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                 >
                     Clear
                 </button>
@@ -148,7 +134,7 @@ export default function CashierProcessRedemptionPage() {
                         <dt style={{ fontWeight: 600 }}>Transaction ID:</dt>
                         <dd>{result.id}</dd>
             
-                        <dt style={{ fontWeight: 600 }}>User UTORid:</dt>
+                        <dt style={{ fontWeight: 600 }}>User Username:</dt>
                         <dd>{result.utorid}</dd>
             
                         <dt style={{ fontWeight: 600 }}>Type:</dt>

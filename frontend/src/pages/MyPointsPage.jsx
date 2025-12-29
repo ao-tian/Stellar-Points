@@ -34,7 +34,7 @@ export default function MyPointsPage() {
         <AppShell title="My Points" subtitle="Account status and loyalty progress.">
             <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card>
-                    <p className="text-sm uppercase text-base-content/60">UTORid</p>
+                    <p className="text-sm uppercase text-base-content/60">Username</p>
                     <p className="text-2xl font-semibold">{me.utorid}</p>
                 </Card>
                 <Card>

@@ -28,7 +28,7 @@ export default function CashierCreateTxPage() {
 
         try {
             if (!utorid.trim()) {
-                throw new Error("UTORid is required");
+                throw new Error("Username is required");
             }
             const spentNum = Number(spent);
             if (!Number.isFinite(spentNum) || spentNum <= 0) {
@@ -78,10 +78,10 @@ export default function CashierCreateTxPage() {
                     gap: "1rem",
                 }}
             >
-                {/* UTORid */}
+                {/* Username */}
                 <div>
                     <label htmlFor="utorid" style={{ display: "block", marginBottom: 4 }}>
-                        Customer UTORid
+                        Customer Username
                     </label>
                     <input
                         id="utorid"
@@ -90,7 +90,7 @@ export default function CashierCreateTxPage() {
                         onChange={(e) => setUtorid(e.target.value)}
                         placeholder="e.g., clive123"
                         required
-                        style={{ width: "100%" }}
+                        className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
                     />
                 </div>
 
@@ -108,7 +108,7 @@ export default function CashierCreateTxPage() {
                         onChange={(e) => setSpent(e.target.value)}
                         placeholder="e.g., 19.99"
                         required
-                        style={{ width: "100%" }}                
+                        className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
                     />
                 </div>
                 <div>
@@ -121,7 +121,7 @@ export default function CashierCreateTxPage() {
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value)}
                         placeholder="e.g., 1, 4, 9"
-                        style={{ width: "100%" }}
+                        className="input input-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
                     />
                     <small style={{ color: "#6b7280" }}>
                         Comma-separated promotion IDs. Only active one-time promos will be
@@ -139,7 +139,7 @@ export default function CashierCreateTxPage() {
                         rows={3}
                         value={remark}
                         onChange={(e) => setRemark(e.target.value)}
-                        style={{ width: "100%" }}
+                        className="textarea textarea-bordered w-full rounded-2xl border-2 border-brand-200 bg-white px-4 py-2 text-neutral focus:border-brand-500 focus:ring-1 focus:ring-brand-200"
                     />
                 </div>
 

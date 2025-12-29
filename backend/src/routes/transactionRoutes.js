@@ -658,22 +658,49 @@ router.get('/users/me/transactions', authenticateToken, requireRole('regular'), 
             }),
         ]);
         const pid = promotionId === undefined ? null : Number(promotionId);
-        const results = rows.filter(tx => {
+        const filteredRows = rows.filter(tx => {
             if (pid == null) return true;
             const ids = shapePromoIds(tx.promotionIds); // int[]
             return ids.includes(pid);
-        }).map(tx => ({
-            id: tx.id,
-            type: tx.type,
-            amount: (tx.type === 'redemption' && tx.processedById == null && typeof tx.redeemed === 'number')
-                ? tx.redeemed
-                : tx.amount,
-            ...(tx.spent != null ? {spent: tx.spent} : {}),
-            ...(tx.relatedId != null ? {relatedId: tx.relatedId} : {}),
-            promotionIds: shapePromoIds(tx.promotionIds),
-            remark: tx.remark || '',
-            createdBy: tx.createdBy?.utorid || null,
-        }));
+        });
+        
+        // Fetch promotion details for all promotion IDs
+        const allPromoIds = new Set();
+        filteredRows.forEach(tx => {
+            const ids = shapePromoIds(tx.promotionIds);
+            ids.forEach(id => allPromoIds.add(id));
+        });
+        
+        const promotions = allPromoIds.size > 0
+            ? await prisma.promotion.findMany({
+                where: { id: { in: Array.from(allPromoIds) } },
+                select: { id: true, name: true },
+            })
+            : [];
+        
+        const promoMap = new Map(promotions.map(p => [p.id, p.name]));
+        
+        const results = filteredRows.map(tx => {
+            const promoIds = shapePromoIds(tx.promotionIds);
+            const promoDetails = promoIds.map(id => ({
+                id,
+                name: promoMap.get(id) || `Promotion #${id}`
+            }));
+            
+            return {
+                id: tx.id,
+                type: tx.type,
+                amount: (tx.type === 'redemption' && tx.processedById == null && typeof tx.redeemed === 'number')
+                    ? tx.redeemed
+                    : tx.amount,
+                ...(tx.spent != null ? {spent: tx.spent} : {}),
+                ...(tx.relatedId != null ? {relatedId: tx.relatedId} : {}),
+                promotionIds: promoIds,
+                promotions: promoDetails,
+                remark: tx.remark || '',
+                createdBy: tx.createdBy?.utorid || null,
+            };
+        });
         return res.status(200).json({count, results});
     } catch (err) {
         console.error('GET /users/me/transactions error:', err);

@@ -112,7 +112,7 @@ export default function UserRedeemPage() {
                     </div>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn font-medium transition-all bg-white text-black border-2 border-black hover:bg-black hover:text-white hover:border-white disabled:opacity-50 disabled:cursor-not-allowed px-6"
                         disabled={redeemMutation.isLoading}
                     >
                         {redeemMutation.isLoading ? "Submitting…" : "Submit redemption request"}

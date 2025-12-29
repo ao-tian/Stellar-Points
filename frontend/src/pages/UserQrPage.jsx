@@ -42,7 +42,7 @@ export default function UserQrPage() {
                 <Card>
                     <dl className="space-y-3 text-sm">
                         <div className="flex justify-between">
-                            <dt className="text-base-content/60">UTORid</dt>
+                            <dt className="text-base-content/60">Username</dt>
                             <dd className="font-semibold">{me.utorid}</dd>
                         </div>
                         <div className="flex justify-between">
