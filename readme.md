@@ -5,13 +5,15 @@ A comprehensive points-based reward system for managing user transactions, event
 ## Screenshots
 
 <div align="center">
-  <img src="demo/demo1.png" alt="Dashboard Overview" width="45%" style="margin: 5px;">
-  <img src="demo/demo2.png" alt="Event Management" width="45%" style="margin: 5px;">
+  <img src="demo/demo1.png" alt="Dashboard Overview" width="80%" style="margin: 20px 0;">
   <br>
-  <img src="demo/demo3.png" alt="Transaction Interface" width="45%" style="margin: 5px;">
-  <img src="demo/demo4.png" alt="User Management" width="45%" style="margin: 5px;">
+  <img src="demo/demo2.png" alt="Event Management" width="80%" style="margin: 20px 0;">
   <br>
-  <img src="demo/demo5.png" alt="Promotion System" width="45%" style="margin: 5px;">
+  <img src="demo/demo3.png" alt="Transaction Interface" width="80%" style="margin: 20px 0;">
+  <br>
+  <img src="demo/demo4.png" alt="User Management" width="80%" style="margin: 20px 0;">
+  <br>
+  <img src="demo/demo5.png" alt="Promotion System" width="80%" style="margin: 20px 0;">
 </div>
 
 ## Features
