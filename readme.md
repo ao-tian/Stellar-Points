@@ -4,24 +4,37 @@ A comprehensive points-based reward system for managing user transactions, event
 
 ## Screenshots
 
-<div align="center">
-  <img src="demo/demo1.png" alt="Dashboard Overview" width="80%" style="margin: 20px 0;">
-  <br>
-  <img src="demo/demo2.png" alt="Event Management" width="80%" style="margin: 20px 0;">
-  <br>
-  <img src="demo/demo3.png" alt="Transaction Interface" width="80%" style="margin: 20px 0;">
-  <br>
-  <img src="demo/demo4.png" alt="User Management" width="80%" style="margin: 20px 0;">
-  <br>
-  <img src="demo/demo5.png" alt="Promotion System" width="80%" style="margin: 20px 0;">
-</div>
+<img src="demo/demo1.png" alt="Dashboard Overview" style="width: 100%; margin: 20px 0; display: block;">
+
+---
+
+<img src="demo/demo2.png" alt="Event Management" style="width: 100%; margin: 20px 0; display: block;">
+
+---
+
+<img src="demo/demo3.png" alt="Transaction Interface" style="width: 100%; margin: 20px 0; display: block;">
+
+---
+
+<img src="demo/demo4.png" alt="User Management" style="width: 100%; margin: 20px 0; display: block;">
+
+---
+
+<img src="demo/demo5.png" alt="Promotion System" style="width: 100%; margin: 20px 0; display: block;">
 
 ## Features
 
+> **RECOMMENDED: Start with Superuser Account to explore full functionality**
+> 
+> **SUPERUSER ACCOUNT:**
+> - **Username:** `superman`
+> - **Password:** `DevStrongPass!`
+> - **Role:** Superuser (full system access - can switch between all interfaces)
+
 ### For Regular Users
 **Example Regular Account:**
-- **UTORid:** `neville1`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+- **Username:** `neville1`
+- **Password:** `DevStrongPass!`
 
 - **Points Management**: View current points balance and transaction history
 - **QR Code**: Generate and display personal QR code for point transactions
@@ -34,8 +47,8 @@ A comprehensive points-based reward system for managing user transactions, event
 
 ### For Cashiers
 **Example Cashier Account:**
-- **UTORid:** `hermione`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+- **Username:** `hermione`
+- **Password:** `DevStrongPass!`
 
 - **Transaction Processing**: Create new purchase transactions for customers
 - **Redemption Processing**: Process point redemptions
@@ -43,8 +56,8 @@ A comprehensive points-based reward system for managing user transactions, event
 
 ### For Event Organizers
 **Example Organizer Account:**
-- **UTORid:** `harrypot`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+- **Username:** `harrypot`
+- **Password:** `DevStrongPass!`
 
 - **Event Management**: Create, edit, and manage events you organize
 - **Point Awards**: Award points to individual guests or all RSVP'd attendees
@@ -53,8 +66,8 @@ A comprehensive points-based reward system for managing user transactions, event
 
 ### For Managers
 **Example Manager Account:**
-- **UTORid:** `yoda1234`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+- **Username:** `yoda1234` or `gandalf01`
+- **Password:** `DevStrongPass!`
 
 - **User Management**: 
   - View all users with advanced filtering, sorting, and pagination
@@ -181,29 +194,29 @@ Open your browser and navigate to `http://localhost:5173` to access the applicat
 
 ### Demo Credentials
 
-After seeding the database, you can log in with these demo accounts (all share the same password):
+After seeding the database, you can log in with these demo accounts. **All accounts share the same password:** `DevStrongPass!`
 
-**Superuser Account:**
-- **UTORid:** `superman`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+**Manager Accounts:**
+- **Username:** `gandalf01` or `yoda1234`
+- **Password:** `DevStrongPass!`
+- **Role:** Manager
 
-**Example Regular User:**
-- **UTORid:** `neville1`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+**Cashier Accounts:**
+- **Username:** `hermione`, `katniss1`, or `frodo123`
+- **Password:** `DevStrongPass!`
+- **Role:** Cashier
 
-**Example Cashier:**
-- **UTORid:** `hermione`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+**Event Organizer Accounts:**
+- **Username:** `harrypot`, `luke1234`, `elrond01`, or `tonystar`
+- **Password:** `DevStrongPass!`
+- **Role:** Regular (assigned as event organizers)
 
-**Example Manager:**
-- **UTORid:** `yoda1234`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
+**Regular User Accounts:**
+- **Username:** `neville1`, `luna1234`, `ron12345`, `gimli123`, `legolas1`, `aragorn1`, and many more
+- **Password:** `DevStrongPass!`
+- **Role:** Regular
 
-**Example Event Organizer:**
-- **UTORid:** `harrypot`
-- **Password:** `1uta716eejnoa161vdsj3h2v1zvihny9`
-
-> **Note:** The demo database includes 30 users, 30 events, 30 promotions, and 120+ transactions. All demo users share the same password as listed above.
+> **Note:** The demo database includes 30 users, 30 events, 30 promotions, and 120+ transactions. All demo users share the same password: `DevStrongPass!` (or the value set in `SEED_PASSWORD` environment variable).
 
 ### Building for production
 ```bash
@@ -221,67 +234,11 @@ npm run start    # serves the API; configure a static host (Netlify, Vercel, etc
 
 ## Deployment
 
-**Note:** The application was previously deployed on Railway, but the free tier has expired. The deployment is no longer active. Below is documentation of how the application was deployed on Railway for reference.
+**Note:** The application was previously deployed on Railway, but the free tier has expired and the deployment is no longer active. The application is currently only available for local development.
 
-### Previous Deployment: Railway
+### Deployment Options
 
-The application was deployed on Railway with automatic database initialization. The deployment consisted of two services: one for the backend API and one for the frontend.
-
-#### Backend Deployment (Railway)
-
-1. **Connect Repository:**
-   - Created a new Railway project
-   - Connected the GitHub repository
-   - Selected the `backend/` directory as the root
-
-2. **Configure Environment Variables:**
-   In Railway dashboard → Backend Service → Variables:
-   ```
-   JWT_SECRET=<your-secure-secret-key>
-   GOOGLE_MAPS_API_KEY=<your-google-maps-api-key> (optional)
-   GOOGLE_GEOCODING_API_KEY=<your-geocoding-api-key> (optional)
-   SEED_PASSWORD=<password-for-seeded-users> (optional)
-   PORT=8080 (Railway sets this automatically)
-   ```
-
-3. **Build Configuration:**
-   - Railway automatically detected Node.js projects
-   - Build command: `npm install` (runs automatically)
-   - Start command: `npm start` (runs `node src/server.js`)
-
-4. **Database Initialization:**
-   - The backend automatically initialized the database on startup
-   - `src/initDb.js` runs `prisma generate`, `prisma db push`, and `npm run seed`
-   - Database was recreated on each deployment (Railway's filesystem is ephemeral)
-
-5. **Backend URL:**
-   - Railway provided a public URL (e.g., `https://stellarbackend-production.up.railway.app`)
-   - This URL was used for frontend configuration
-
-#### Frontend Deployment (Railway)
-
-1. **Create New Service:**
-   - In the same Railway project, added a new service
-   - Selected the `frontend/` directory as the root
-
-2. **Configure Environment Variables:**
-   In Railway dashboard → Frontend Service → Variables:
-   ```
-   VITE_API_BASE_URL=https://your-backend-url.railway.app
-   VITE_GOOGLE_MAPS_API_KEY=<your-google-maps-api-key> (for map features)
-   ```
-   **Important:** These must be set BEFORE building, as Vite embeds env vars at build time.
-
-3. **Build Configuration:**
-   - Railway detected Vite projects automatically
-   - Build command: `npm run build` (creates `dist/` folder)
-   - Start command: `npx serve -s dist -l 8080` (serves static files)
-
-4. **Redeploy After Env Changes:**
-   - If `VITE_*` variables were changed, a redeploy was required
-   - Vite embeds environment variables at build time, not runtime
-
-### Alternative Deployment Options
+For production deployment, consider the following platforms:
 
 **Backend:**
 - Render, Fly.io, Heroku, DigitalOcean App Platform
